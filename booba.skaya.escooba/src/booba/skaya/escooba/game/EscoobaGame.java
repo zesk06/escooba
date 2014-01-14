@@ -33,21 +33,28 @@ public class EscoobaGame implements Serializable {
 	/**The players */
 	private final ArrayList<EscoobaPlayer> _players;
 	
+	/** The scores game by game */
+	private final ArrayList<ArrayList<Integer>> _scores;
+	
 	private transient EscoobagameListener _listener;
 	
 	private int _currentPlayer;
 	private int _round;
+
+	/** The last player that pick up something, used for the last round*/
+	private int _lastPlayerThatPickUpSomething;
 	
 	public EscoobaGame() {
 		_deck = new ArrayList<EscoobaCard>();
 		_pile  = new ArrayList<EscoobaCard>();
 		_table = new ArrayList<EscoobaCard>();
 		_players = new ArrayList<EscoobaPlayer>();
+		_lastPlayerThatPickUpSomething = -1;
+		_scores = new ArrayList<ArrayList<Integer>>();
 		initDeck();
 		initPlayers();
 		newGame();
 		newRound();
-		warnListener();
 	}
 
 	private void initPlayers() {
@@ -78,10 +85,10 @@ public class EscoobaGame implements Serializable {
 			p.newGame();
 		}
 		_pile.clear();
-		ArrayList<EscoobaCard> toto = new ArrayList<EscoobaCard>(_deck);
-		while(!toto.isEmpty()){
-			int randomRank = (int) (Math.random() * toto.size());
-			_pile.add(toto.remove(randomRank));
+		ArrayList<EscoobaCard> shufflingDeck = new ArrayList<EscoobaCard>(_deck);
+		while(!shufflingDeck.isEmpty()){
+			int randomRank = (int) (Math.random() * shufflingDeck.size());
+			_pile.add(shufflingDeck.remove(randomRank));
 		}
 		_table.clear();
 		//put 4 card on table 
@@ -89,7 +96,7 @@ public class EscoobaGame implements Serializable {
 			_table.add(_pile.remove(0));
 		}
 		_round = 0;
-		warnListener();
+		warnListener(EscoobaEvent.GAME_NEW);
 	}
 	
 	public void newRound() {
@@ -103,16 +110,16 @@ public class EscoobaGame implements Serializable {
 			}
 		}
 		_currentPlayer = 0;
-		warnListener();
+		warnListener(EscoobaEvent.ROUND_NEW);
 	}
 	
 	public void registerGameListener(EscoobagameListener listener){
 		_listener = listener;
 	}
 	
-	private void warnListener(){
+	private void warnListener(EscoobaEvent event){
 		if(_listener != null){
-			_listener.somethingHappen();
+			_listener.somethingHappen(event);
 		}
 	}
 
@@ -128,6 +135,7 @@ public class EscoobaGame implements Serializable {
 		if(playedCards != null && isPossible(playedCards)){
 			if(playedCards.size() > 1){ //some table cards means the player pick up cards
 				getCurrentPlayer().addTrick(playedCards, playedCards.size() == _table.size()+1);
+				_lastPlayerThatPickUpSomething = _currentPlayer;
 			}else if(playedCards.size() == 1){
 				//ok player must throw his card
 				_table.add(playedCards.get(0));
@@ -137,12 +145,26 @@ public class EscoobaGame implements Serializable {
 			//move to next player !
 			_currentPlayer = (_currentPlayer + 1) % PLAYERS_NB;
 			//if next player has no more card, start new round
-			if(getCurrentPlayer().getHand().size() == 0){
+			if(getCurrentPlayer().getHand().size() == 0 && _pile.size() == 0){
+				endGame();
+			} else if(getCurrentPlayer().getHand().size() == 0){
 				newRound();
 			}
 		}
 	}
 	
+	/**
+	 * Called to end the current game
+	 */
+	private void endGame() {
+		//give the remaining card to the last player that took cards.
+		if(_lastPlayerThatPickUpSomething >= 0){
+			_players.get(_lastPlayerThatPickUpSomething).addTrick(_table, false);
+			_table.clear();
+		}
+		warnListener(EscoobaEvent.GAME_END);
+	}
+
 	public EscoobaPlayer getCurrentPlayer() {
 		return _players.get(_currentPlayer);
 	}
@@ -256,6 +278,9 @@ public class EscoobaGame implements Serializable {
 
 	public Collection<EscoobaPlayer> getPlayers() {
 		return _players;
-		
+	}
+	
+	public ArrayList<ArrayList<Integer>> getScores(){
+		return _scores;
 	}
 }
