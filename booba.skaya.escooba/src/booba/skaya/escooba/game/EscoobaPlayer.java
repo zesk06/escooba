@@ -36,6 +36,7 @@ public class EscoobaPlayer implements Serializable {
 	public void newGame() {
 		_hand.clear();
 		_tricks.clear();
+		_escobaNb = 0;
 	}
 
 	public Collection<EscoobaCard> getHand() {
