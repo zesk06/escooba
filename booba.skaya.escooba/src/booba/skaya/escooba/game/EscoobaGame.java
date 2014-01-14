@@ -208,6 +208,7 @@ public class EscoobaGame implements Serializable {
 	private ArrayList<EscoobaPlayer> getPlayerWithMax(ScoreCounterInterface counter) {
 		ArrayList<EscoobaPlayer> playersWithMax = new ArrayList<EscoobaPlayer>();
 		int maxNb       = counter.score(_players.get(0));
+		playersWithMax.add(_players.get(0));
 		for(int i =1; i < PLAYERS_NB; i++){
 			int playerScore = counter.score(_players.get(i));
 			if(playerScore > maxNb){
