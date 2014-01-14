@@ -3,6 +3,7 @@ package booba.skaya.escooba;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,13 +12,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import booba.skaya.escooba.game.EscoobaCard;
+import booba.skaya.escooba.game.EscoobaEvent;
 import booba.skaya.escooba.game.EscoobaGame;
 import booba.skaya.escooba.game.EscoobaPlayer;
 import booba.skaya.escooba.game.EscoobagameListener;
 import booba.skaya.escooba.view.CardView;
 
-public class Escooba extends Activity {
+public class Escooba extends Activity implements EscoobagameListener {
 
+	private static final int SCORE_ACTIVITY_RETURN = 1234;
+	
 	private final static int TABLE_CARDS_NB = 8;
 	private final static int HAND_CARDS_NB = 3;
 	private final CardView[] _tableCards;
@@ -63,12 +67,7 @@ public class Escooba extends Activity {
 	
 	private void setEscoobaGame(EscoobaGame g){
 		_g = g;
-		_g.registerGameListener(new EscoobagameListener() {
-			@Override
-			public void somethingHappen() {
-				refreshGame();
-			}
-		});
+		_g.registerGameListener(this);
 		//first refresh
 		refreshGame();
 	}
@@ -180,7 +179,7 @@ public class Escooba extends Activity {
 		//get the table content :
 		int index = 0;
 		for(EscoobaCard c : _g.getTableCards()){
-			if(_tableCards[index] != null) _tableCards[index++].setCard(c);
+			if(index < _tableCards.length && _tableCards[index] != null) _tableCards[index++].setCard(c);
 		}
 		
 		index = 0;
@@ -189,8 +188,36 @@ public class Escooba extends Activity {
 		}
 		String bottom = "";
 		for(EscoobaPlayer p : _g.getPlayers()){
-			bottom += "P"+p.getId()+" "+p.getTrickSize()+"c | "+p.getOrosNb()+"o | "+p.getEscobaNumber()+"e "+(p.has7deOro()?"7o":"")+" = "+_g.getRoundScore()[p.getId()]+"pts\n";
+			bottom += "P"+p.getId()+" "+p.getTrickSize()+"c | "+p.getOrosNb()+"o | "+p.getEscobaNumber()+"e "+(p.has7deOro()?" + 7o":"")+" = "+_g.getRoundScore()[p.getId()]+"pts\n";
 		}
 		if(_bottomText != null) _bottomText.setText(bottom);
 	}
+
+	@Override
+	public void somethingHappen(EscoobaEvent event) {
+		switch (event) {
+		case GAME_NEW:
+		case ROUND_NEW:
+			refreshGame();
+			break;
+		case GAME_END:
+			endGame();
+			break;
+		}
+	}
+
+	private void endGame() {
+		//launch intent that display the score
+		Intent intent = new Intent(this, EscoobaScoreActivity.class);
+	    intent.putExtra(EscoobaScoreActivity.SCORE_EXTRA, 12);
+	    startActivityForResult(intent, SCORE_ACTIVITY_RETURN);
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if(resultCode == RESULT_OK && requestCode == SCORE_ACTIVITY_RETURN){
+			
+		}
+	}
+	
 }
