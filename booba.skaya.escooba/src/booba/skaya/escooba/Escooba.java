@@ -189,7 +189,7 @@ public class Escooba extends Activity {
 		}
 		String bottom = "";
 		for(EscoobaPlayer p : _g.getPlayers()){
-			bottom += p.getId()+" "+p.getTrickSize()+"c | "+p.getOrosNb()+"o | "+p.getEscobaNumber()+"e\n";
+			bottom += "P"+p.getId()+" "+p.getTrickSize()+"c | "+p.getOrosNb()+"o | "+p.getEscobaNumber()+"e "+(p.has7deOro()?"7o":"")+" = "+_g.getRoundScore()[p.getId()]+"pts\n";
 		}
 		if(_bottomText != null) _bottomText.setText(bottom);
 	}
