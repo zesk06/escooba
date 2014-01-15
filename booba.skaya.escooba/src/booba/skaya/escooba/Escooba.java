@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,7 +36,7 @@ public class Escooba extends Activity implements EscoobagameListener {
 	public Escooba(){
 		_tableCards   = new CardView[TABLE_CARDS_NB];
 		_playerCards  = new CardView[HAND_CARDS_NB];
-		_touchListener = new EscobaOnTouchListener();
+		_touchListener = new EscobaOnTouchListener(this);
 		setEscoobaGame(new EscoobaGame());
 	}
 	
@@ -124,19 +125,7 @@ public class Escooba extends Activity implements EscoobagameListener {
 	}
 	
 	public void play(View view){
-		//get selected cards
-		ArrayList<EscoobaCard> playedCard = new ArrayList<EscoobaCard>();
-		for(CardView c : _playerCards){
-			if(c.isChosen()){
-				playedCard.add(c.getCard());
-				break;
-			}
-		}
-		for(CardView c : _tableCards){
-			if(c.isChosen() && c.getCard() != null){
-				playedCard.add(c.getCard());
-			}
-		}
+		ArrayList<EscoobaCard> playedCard = getSelectedCards();
 		//play them if playable
 		if(_g.isPossible(playedCard)){
 			_g.play(playedCard);
@@ -226,5 +215,27 @@ public class Escooba extends Activity implements EscoobagameListener {
 			newGame();
 		}
 	}
+
+	public void cardToggled() {
+		if(_g != null){
+			Button button = (Button) findViewById(R.id.play_button);
+			button.setEnabled(_g.isPossible(getSelectedCards()));
+		}
+	}
 	
+	private ArrayList<EscoobaCard> getSelectedCards() {
+		ArrayList<EscoobaCard> playedCard = new ArrayList<EscoobaCard>();
+		for(CardView c : _playerCards){
+			if(c.isChosen()){
+				playedCard.add(c.getCard());
+				break;
+			}
+		}
+		for(CardView c : _tableCards){
+			if(c.isChosen() && c.getCard() != null){
+				playedCard.add(c.getCard());
+			}
+		}
+		return playedCard;
+	}
 }
