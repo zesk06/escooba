@@ -190,7 +190,7 @@ public class EscoobaGame implements Serializable {
 		_round = round;
 	}
 	
-	public int[] getRoundScore(){
+	public int[] getCurrentGameScore(){
 		int[] score = new int[PLAYERS_NB];
 		//rule 1: 1 pt for the player with max card
 		ArrayList<EscoobaPlayer> maxCardPlayers = getPlayerWithMax(new ScoreCounterInterface() {
@@ -212,14 +212,24 @@ public class EscoobaGame implements Serializable {
 		if(maxOrosPlayers.size() == 1){
 			score[maxOrosPlayers.get(0).getId()] += 1;
 		}
-		//Rule 3: 1pt for the player with the 7 de ORO
+		//Rule 3: 1pt for the player with max 7
+		ArrayList<EscoobaPlayer> max7Players = getPlayerWithMax(new ScoreCounterInterface() {
+			@Override
+			public int score(EscoobaPlayer p) {
+				return p.get7Nb();
+			}
+		});
+		if(max7Players.size() == 1){
+			score[max7Players.get(0).getId()] += 1;
+		}
+		//Rule 4: 1pt for the player with the 7 de ORO
 		for(EscoobaPlayer p : _players){
 			if(p.has7deOro()){
 				score[p.getId()]+=1;
 				break;
 			}
 		}
-		//Rule 4: Add escobas
+		//Rule 5: Add escobas
 		for(EscoobaPlayer p : _players){
 			score[p.getId()]+=p.getEscobaNumber();
 		}

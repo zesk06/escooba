@@ -167,7 +167,7 @@ public class Escooba extends Activity implements EscoobagameListener {
 		//Something happen in the game model, refresh the view
 		if(_g != null && _headerText != null){
 			int playerId = _g.getCurrentPlayer().getId();
-			_headerText.setText("Player: "+playerId+" Round "+_g.getRound()+"("+_g.getRoundScore()[playerId]+"pts)");
+			_headerText.setText("Player: "+playerId+" Round "+_g.getRound()+"("+_g.getCurrentGameScore()[playerId]+"pts)");
 		}
 		//void the cards  -- 
 		for(CardView cv : _tableCards){
@@ -188,7 +188,7 @@ public class Escooba extends Activity implements EscoobagameListener {
 		}
 		String bottom = "";
 		for(EscoobaPlayer p : _g.getPlayers()){
-			bottom += "P"+p.getId()+" "+p.getTrickSize()+"c | "+p.getOrosNb()+"o | "+p.getEscobaNumber()+"e "+(p.has7deOro()?" + 7o":"")+" = "+_g.getRoundScore()[p.getId()]+"pts\n";
+			bottom += "P"+p.getId()+" "+p.getTrickSize()+"c\t| "+p.getOrosNb()+"o | "+p.getEscobaNumber()+"e | "+p.get7Nb()+"7"+(p.has7deOro()?"+":"")+" = "+_g.getCurrentGameScore()[p.getId()]+"pts\n";
 		}
 		if(_bottomText != null) _bottomText.setText(bottom);
 	}

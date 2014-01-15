@@ -93,4 +93,14 @@ public class EscoobaPlayer implements Serializable {
 	public String toString() {
 		return "player "+getId();
 	}
+
+	public int get7Nb() {
+		int nb7 = 0;
+		for(EscoobaCard c : _tricks){
+			if(c.getValue() == 7){
+				nb7 +=1;
+			}
+		}
+		return nb7;
+	}
 }
