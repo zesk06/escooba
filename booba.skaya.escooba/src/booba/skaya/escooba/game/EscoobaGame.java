@@ -156,13 +156,20 @@ public class EscoobaGame implements Serializable {
 	/**
 	 * Called to end the current game
 	 */
-	private void endGame() {
+	public void endGame() {
 		//give the remaining card to the last player that took cards.
 		if(_lastPlayerThatPickUpSomething >= 0){
 			_players.get(_lastPlayerThatPickUpSomething).addTrick(_table, false);
 			_table.clear();
 		}
+		//add current score to scores
+		ArrayList<Integer> newScore = new ArrayList<Integer>();
+		for(int i : getCurrentGameScore()){
+			newScore.add(i);
+		}
+		_scores.add(newScore);
 		warnListener(EscoobaEvent.GAME_END);
+
 	}
 
 	public EscoobaPlayer getCurrentPlayer() {

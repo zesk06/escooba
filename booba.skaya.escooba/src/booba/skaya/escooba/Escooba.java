@@ -87,6 +87,12 @@ public class Escooba extends Activity implements EscoobagameListener {
 	            newGame();
 	            setStatusText("New Game started");
 	            return true;
+	        case R.id.action_end_game:
+	        	//for purpose test, end the current game
+	            //calling _g.endGame() instead of this.endGame() is the correct thing to do.
+	        	//Because _g.endGame() perform stuff, and this is only the viewer
+	        	_g.endGame();
+	            return true;
 	        default:
 	            return super.onOptionsItemSelected(item);
 	    }
@@ -209,14 +215,15 @@ public class Escooba extends Activity implements EscoobagameListener {
 	private void endGame() {
 		//launch intent that display the score
 		Intent intent = new Intent(this, EscoobaScoreActivity.class);
-	    intent.putExtra(EscoobaScoreActivity.SCORE_EXTRA, 12);
+		//retrieve the score to be displayed
+		intent.putExtra(EscoobaScoreActivity.SCORE_EXTRA, _g.getScores());
 	    startActivityForResult(intent, SCORE_ACTIVITY_RETURN);
 	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if(resultCode == RESULT_OK && requestCode == SCORE_ACTIVITY_RETURN){
-			
+			newGame();
 		}
 	}
 	

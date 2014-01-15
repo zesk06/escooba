@@ -25,10 +25,10 @@
         <activity
             android:name="booba.skaya.escooba.EscoobaScoreActivity"
             android:label="@string/title_activity_score"
-            android:parentActivityName="booba.skaya.Escooba" >
+            android:parentActivityName="booba.skaya.escooba.Escooba" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="booba.skaya.Escooba" />
+                android:value="booba.skaya.escooba.Escooba" />
         </activity>
     </application>
 

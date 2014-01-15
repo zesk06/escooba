@@ -3,6 +3,7 @@
 
     <string name="app_name">Escooba</string>
     <string name="action_new_game">New game</string>
+    <string name="action_end_game">End game</string>
     <string name="card_description">A card</string>
     <string name="header_text">Escooba header</string>
     <string name="table_card_width">50dp</string>
