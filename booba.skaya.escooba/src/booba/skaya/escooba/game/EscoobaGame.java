@@ -285,10 +285,54 @@ public class EscoobaGame implements Serializable {
 			possibleCombinations.add(play);
 		}
 		//we have all the possible combination in possibleCombinations
-		//choose the first for now
-		play(possibleCombinations.get(0));
+		play(searchBestCombination(possibleCombinations));
 	}
 	
+	private ArrayList<EscoobaCard> searchBestCombination(ArrayList<ArrayList<EscoobaCard>> possibleCombinations) {
+		//Compute for each combination the 4 criterias in this order of importance
+		// - Escoba?
+		// - 7 de oro picked up
+		// - Number of 7 picked up
+		// - Number of cards picked up
+		// compute a score based on :
+		//   Escoba   * 10 00 00 00
+		// + 7 de oro *    10 00 00
+		// + Nb of 7  *       10 00
+		// + Nb of oro*          10
+		// + Nb of card
+		int ESCOBA_FACTOR = 10000000;
+		int ORO_7_FACTOR  = 100000;
+		int D7_FACTOR     = 1000;
+		int ORO_FACTOR    = 10;
+		int CARD_FACTOR   = 1;
+		int maxScore = -1;
+		ArrayList<EscoobaCard> bestCombination = null;
+		for(ArrayList<EscoobaCard> combination : possibleCombinations){
+			int score = 0;
+			//escoba?
+			if(combination.containsAll(_table)){
+				score += 1*ESCOBA_FACTOR;
+			}
+			//parse all cards
+			for(EscoobaCard c : combination){
+				if(c.getColor() == EscoobaColor.ORO){
+					score += ORO_FACTOR;
+					if(c.getValue() == 7){
+						score += ORO_7_FACTOR + D7_FACTOR;
+					}
+				}else if(c.getValue() == 7){
+					score += D7_FACTOR;
+				}
+				score += CARD_FACTOR;
+			}
+			if(score > maxScore){
+				maxScore = score;
+				bestCombination = combination;
+			}
+		}
+		return bestCombination;
+	}
+
 	interface ScoreCounterInterface {
 		int score(EscoobaPlayer p);
 	}
