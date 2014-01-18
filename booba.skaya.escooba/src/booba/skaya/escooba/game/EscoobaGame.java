@@ -178,6 +178,11 @@ public class EscoobaGame implements Serializable {
 
 	public boolean isPossible(ArrayList<EscoobaCard> playedCards){
 		if(playedCards != null && playedCards.size() > 1){
+			//if second card is not on table, it means it is a player's cards.
+			//and player is not allowed to play more than one card from his hand
+			if(!_table.contains(playedCards.get(1))){
+				return false;
+			}
 			int sum = 0;
 			for(EscoobaCard card :playedCards){
 				sum += card.getValue();

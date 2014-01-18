@@ -32,6 +32,7 @@ public class Escooba extends Activity implements EscoobagameListener {
 	private EscoobaGame _g;
 	private transient TextView _headerText;
 	private transient TextView _bottomText;
+	private transient Button _playButton;
 	
 	public Escooba(){
 		_tableCards   = new CardView[TABLE_CARDS_NB];
@@ -61,9 +62,8 @@ public class Escooba extends Activity implements EscoobagameListener {
 		_playerCards[1] = (CardView) findViewById(R.id.player_card_2);
 		_playerCards[2] = (CardView) findViewById(R.id.player_card_3);
 		//
-		
+		_playButton = (Button) findViewById(R.id.play_button);
 		registerCardsListeners();
-
 	}
 	
 	private void setEscoobaGame(EscoobaGame g){
@@ -186,6 +186,7 @@ public class Escooba extends Activity implements EscoobagameListener {
 			bottom += "P"+p.getId()+" "+p.getTrickSize()+"c\t| "+p.getOrosNb()+"o | "+p.getEscobaNumber()+"e | "+p.get7Nb()+"7"+(p.has7deOro()?"+":"")+" = "+_g.getCurrentGameScore()[p.getId()]+"pts\n";
 		}
 		if(_bottomText != null) _bottomText.setText(bottom);
+		cardToggled();
 	}
 
 	@Override
@@ -217,9 +218,8 @@ public class Escooba extends Activity implements EscoobagameListener {
 	}
 
 	public void cardToggled() {
-		if(_g != null){
-			Button button = (Button) findViewById(R.id.play_button);
-			button.setEnabled(_g.isPossible(getSelectedCards()));
+		if(_g != null && _playButton != null){
+			_playButton.setEnabled(_g.isPossible(getSelectedCards()));
 		}
 	}
 	
@@ -228,7 +228,6 @@ public class Escooba extends Activity implements EscoobagameListener {
 		for(CardView c : _playerCards){
 			if(c.isChosen()){
 				playedCard.add(c.getCard());
-				break;
 			}
 		}
 		for(CardView c : _tableCards){
