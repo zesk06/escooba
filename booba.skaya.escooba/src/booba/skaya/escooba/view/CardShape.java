@@ -1,5 +1,8 @@
 package booba.skaya.escooba.view;
 
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
@@ -8,6 +11,7 @@ import android.graphics.RectF;
 import android.graphics.drawable.ShapeDrawable;
 import android.util.Log;
 import android.view.MotionEvent;
+import booba.skaya.escooba.R;
 import booba.skaya.escooba.game.EscoobaCard;
 import booba.skaya.escooba.util.Rects;
 
@@ -19,7 +23,7 @@ public class CardShape extends ShapeDrawable implements TouchableInterface{
 	private boolean mChosen;
 	private EscoobaCard mCard;
 	private Paint mPaintText;
-	
+	private static Bitmap mCardBitmap;
 
 
 
@@ -32,15 +36,20 @@ public class CardShape extends ShapeDrawable implements TouchableInterface{
 		mPaintInside.setColor(0xFF333333);
 		mPaintOutline=  new  Paint();
 		mPaintOutline.setStyle(Style.STROKE);
-		mPaintOutline.setStrokeWidth(4);
+		mPaintOutline.setStrokeWidth(6);
 		mPaintText = new Paint();
 		mPaintText.setTextSize(30);
 		mPaintText.setColor(0xFFFFFFFF);
-		
 		mCard = null;
 		setChosen(false);
 	}
 	
+	public static Bitmap initCardBitMap(Resources r){
+		if(mCardBitmap == null){
+			mCardBitmap = BitmapFactory.decodeResource(r, R.drawable.cards);
+		}
+		return mCardBitmap;
+	}
 	
 	@Override
 	public void setBounds(int left, int top, int right, int bottom) {
@@ -63,14 +72,23 @@ public class CardShape extends ShapeDrawable implements TouchableInterface{
 		r.inset(3, 3);
 		//draw card value
 		if(mCard == null){
-			canvas.drawRoundRect(new RectF(r), (float) r.width()/10, (float)r.height()/10, mPaintInsideNoCard);	
+			//canvas.drawRoundRect(new RectF(r), (float) r.width()/10, (float)r.height()/10, mPaintInsideNoCard);	
 		}else{
-			canvas.drawRoundRect(new RectF(r), (float) r.width()/10, (float)r.height()/10, mPaintInside);
+			Rect src = new Rect();
+			src.top   = mCardBitmap.getHeight()/4 * mCard.getColor().ordinal();
+			src.left  = mCardBitmap.getWidth()/10 * (mCard.getValue() -1);// minus 1 because cards starts at 0
+			src.right = mCardBitmap.getWidth()/10 * (mCard.getValue() - 1 +1);
+			src.bottom = mCardBitmap.getHeight()/4* (mCard.getColor().ordinal()+1);
+			Log.i("ESCOOBA", "image: "+mCardBitmap.getWidth()+"/"+mCardBitmap.getHeight());
+			canvas.drawBitmap(mCardBitmap, src, r, getPaint());
+			
+			//canvas.drawRoundRect(new RectF(r), (float) r.width()/10, (float)r.height()/10, mPaintInside);
 			//draw card value
-			canvas.drawText(mCard.toString(), r.centerX(), r.centerY(), mPaintText);
+			//canvas.drawText(mCard.toString(), r.centerX(), r.centerY(), mPaintText);
+			canvas.drawRoundRect(new RectF(r), (float) r.width()/15, (float)r.height()/15, mPaintOutline);
 		}
-		//paint the border
-		canvas.drawRoundRect(new RectF(r), (float) r.width()/10, (float)r.height()/10, mPaintOutline);
+		
+		
 	}
 
 	public boolean onTouchEvent(MotionEvent event) {
@@ -86,7 +104,7 @@ public class CardShape extends ShapeDrawable implements TouchableInterface{
 
 	void setChosen(boolean choose) {
 		mChosen = choose;
-		mPaintOutline.setColor(mChosen?0xFF44FF44:0xFFBBBBBB);
+		mPaintOutline.setColor(mChosen?0xFF44FF44:0xFF444444);
 		
 		invalidateSelf();
 	}

@@ -13,16 +13,12 @@ import booba.skaya.escooba.game.EscoobaGame;
 
 public class EscoobaTableView extends View {
 	private Paint mTextPaint;
-//	private Bitmap mCardBitmap;
-	private String _status;
-	
-	private int _lastX;
-	private int _lastY;
+
 	private Paint _clickPaint;
 	
 	//the shapes to display
-	PlayerShape _playerShape = new PlayerShape();
-	TableShape _tableShape   = new TableShape();
+	private PlayerShape _playerShape;
+	private TableShape _tableShape;
 
 	public EscoobaTableView(Context context) {
 		super(context);
@@ -49,11 +45,13 @@ public class EscoobaTableView extends View {
 	private void init() {
 		mTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		mTextPaint.setColor(0xBBFFFFFF);
-		//mCardBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.basto_1);
-		_status = "status text";
+		
 		_clickPaint = new Paint();
 		_clickPaint.setColor(0xBBFFFFFF);
 		_clickPaint.setStyle(Paint.Style.STROKE);
+		CardShape.initCardBitMap(getResources());
+		_playerShape = new PlayerShape();
+		_tableShape = new TableShape();
 	}
 
 	@Override
@@ -71,16 +69,14 @@ public class EscoobaTableView extends View {
 		_tableShape.draw(canvas);
 		_playerShape.draw(canvas);
 		// Draw the label text
-		canvas.drawText(_status, 10, 10, mTextPaint);
-		canvas.drawCircle(_lastX, _lastY, 10, _clickPaint);
+//		canvas.drawText(_status, 10, 10, mTextPaint);
+//		canvas.drawCircle(_lastX, _lastY, 10, _clickPaint);
 	}
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		boolean result = super.onTouchEvent(event);
-		_status = "New on touch event "+event.getX()+" "+event.getY();
-		_lastX = (int) event.getX();
-		_lastY = (int) event.getY();
+
 		_playerShape.onTouchEvent(event);
 		_tableShape.onTouchEvent(event);
 		invalidate();
