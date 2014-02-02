@@ -9,7 +9,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 import booba.skaya.escooba.game.EscoobaCard;
 import booba.skaya.escooba.game.EscoobaEvent;
@@ -22,7 +21,6 @@ public class Escooba extends Activity implements EscoobagameListener {
 	private static final int SCORE_ACTIVITY_RETURN = 1234;
 	
 	private EscoobaGame _g;
-	private transient TextView _bottomText;
 	private transient Button _playButton;
 	private transient EscoobaTableView _tableView;
 	
@@ -60,7 +58,6 @@ public class Escooba extends Activity implements EscoobagameListener {
 	    switch (item.getItemId()) {
 	        case R.id.action_new_game:
 	            newGame();
-	            setStatusText("New Game started");
 	            return true;
 	        case R.id.action_end_game:
 	        	//for purpose test, end the current game
@@ -85,10 +82,6 @@ public class Escooba extends Activity implements EscoobagameListener {
 		super.onRestoreInstanceState(savedInstanceState);
 	}
 
-	void setStatusText(String msg){
-        if(_bottomText != null) _bottomText.setText(msg);
-	}
-	
 	public void play(View view){
 		ArrayList<EscoobaCard> playedCard = getSelectedCards();
 		//play them if playable
@@ -102,8 +95,6 @@ public class Escooba extends Activity implements EscoobagameListener {
 			}
 			//
 			refreshGame();
-		}else{
-			_bottomText.setText("This move is not possible - try again");
 		}
 	}
 	
