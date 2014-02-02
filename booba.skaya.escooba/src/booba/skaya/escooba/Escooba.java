@@ -9,35 +9,24 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import booba.skaya.escooba.game.EscoobaCard;
 import booba.skaya.escooba.game.EscoobaEvent;
 import booba.skaya.escooba.game.EscoobaGame;
-import booba.skaya.escooba.game.EscoobaPlayer;
 import booba.skaya.escooba.game.EscoobagameListener;
-import booba.skaya.escooba.view.CardView;
+import booba.skaya.escooba.view.EscoobaTableView;
 
 public class Escooba extends Activity implements EscoobagameListener {
 
 	private static final int SCORE_ACTIVITY_RETURN = 1234;
 	
-	private final static int TABLE_CARDS_NB = 8;
-	private final static int HAND_CARDS_NB = 3;
-	private final CardView[] _tableCards;
-	private final CardView[] _playerCards;
-
-	private final EscobaOnTouchListener _touchListener;
 	private EscoobaGame _g;
-	private transient TextView _headerText;
 	private transient TextView _bottomText;
 	private transient Button _playButton;
+	private transient EscoobaTableView _tableView;
 	
 	public Escooba(){
-		_tableCards   = new CardView[TABLE_CARDS_NB];
-		_playerCards  = new CardView[HAND_CARDS_NB];
-		_touchListener = new EscobaOnTouchListener(this);
 		setEscoobaGame(new EscoobaGame());
 	}
 	
@@ -45,30 +34,15 @@ public class Escooba extends Activity implements EscoobagameListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_escoba);
-		//
-		_headerText = (TextView) findViewById(R.id.header_text);
-		_bottomText = (TextView) findViewById(R.id.bottom_text);
-		//
-		_tableCards[0] = (CardView) findViewById(R.id.table_card_1);
-		_tableCards[1] = (CardView) findViewById(R.id.table_card_2);
-		_tableCards[2] = (CardView) findViewById(R.id.table_card_3);
-		_tableCards[3] = (CardView) findViewById(R.id.table_card_4);
-		_tableCards[4] = (CardView) findViewById(R.id.table_card_5);
-		_tableCards[5] = (CardView) findViewById(R.id.table_card_6);
-		_tableCards[6] = (CardView) findViewById(R.id.table_card_7);
-		_tableCards[7] = (CardView) findViewById(R.id.table_card_8);
-		//
-		_playerCards[0] = (CardView) findViewById(R.id.player_card_1);
-		_playerCards[1] = (CardView) findViewById(R.id.player_card_2);
-		_playerCards[2] = (CardView) findViewById(R.id.player_card_3);
-		//
 		_playButton = (Button) findViewById(R.id.play_button);
-		registerCardsListeners();
+		_tableView = (EscoobaTableView) findViewById(R.id.escoobaTableView1);
+		_tableView.setEscoobaGame(_g);
 	}
 	
 	private void setEscoobaGame(EscoobaGame g){
 		_g = g;
 		_g.registerGameListener(this);
+		if(_tableView != null) _tableView.setEscoobaGame(_g);
 		//first refresh
 		refreshGame();
 	}
@@ -111,17 +85,8 @@ public class Escooba extends Activity implements EscoobagameListener {
 		super.onRestoreInstanceState(savedInstanceState);
 	}
 
-	private void registerCardsListeners() {
-		for(ImageView card : _tableCards){
-			card.setOnClickListener(_touchListener);
-		}
-		for(ImageView card : _playerCards){
-			card.setOnClickListener(_touchListener);
-		}
-	}
-	
 	void setStatusText(String msg){
-        _bottomText.setText(msg);
+        if(_bottomText != null) _bottomText.setText(msg);
 	}
 	
 	public void play(View view){
@@ -143,12 +108,7 @@ public class Escooba extends Activity implements EscoobagameListener {
 	}
 	
 	private void unselectAllCards() {
-		for(CardView c : _playerCards){
-			c.setChosen(false);
-		}
-		for(CardView c : _tableCards){
-			c.setChosen(false);
-		}
+		_tableView.unselectAllCards();
 	}
 
 	private void newGame() {
@@ -159,34 +119,7 @@ public class Escooba extends Activity implements EscoobagameListener {
 	}
 	
 	private void refreshGame(){
-		//Something happen in the game model, refresh the view
-		if(_g != null && _headerText != null){
-			int playerId = _g.getCurrentPlayer().getId();
-			_headerText.setText("Player: "+playerId+" Round "+_g.getRound()+"("+_g.getCurrentGameScore()[playerId]+"pts)");
-		}
-		//void the cards  -- 
-		for(CardView cv : _tableCards){
-			if(cv != null) cv.setCard(null);
-		}
-		for(CardView cv : _playerCards){
-			if(cv != null) cv.setCard(null);
-		}
-		//get the table content :
-		int index = 0;
-		for(EscoobaCard c : _g.getTableCards()){
-			if(index < _tableCards.length && _tableCards[index] != null) _tableCards[index++].setCard(c);
-		}
-		
-		index = 0;
-		for(EscoobaCard c : _g.getCurrentPlayer().getHand()){
-			if(_playerCards[index] != null) _playerCards[index++].setCard(c);
-		}
-		String bottom = "";
-		for(EscoobaPlayer p : _g.getPlayers()){
-			bottom += "P"+p.getId()+" "+p.getTrickSize()+"c\t| "+p.getOrosNb()+"o | "+p.getEscobaNumber()+"e | "+p.get7Nb()+"7"+(p.has7deOro()?"+":"")+" = "+_g.getCurrentGameScore()[p.getId()]+"pts\n";
-		}
-		if(_bottomText != null) _bottomText.setText(bottom);
-		cardToggled();
+		if(_tableView != null) _tableView.invalidate();
 	}
 
 	@Override
@@ -224,17 +157,6 @@ public class Escooba extends Activity implements EscoobagameListener {
 	}
 	
 	private ArrayList<EscoobaCard> getSelectedCards() {
-		ArrayList<EscoobaCard> playedCard = new ArrayList<EscoobaCard>();
-		for(CardView c : _playerCards){
-			if(c.isChosen()){
-				playedCard.add(c.getCard());
-			}
-		}
-		for(CardView c : _tableCards){
-			if(c.isChosen() && c.getCard() != null){
-				playedCard.add(c.getCard());
-			}
-		}
-		return playedCard;
+		return _tableView.getSelectedCards();
 	}
 }
