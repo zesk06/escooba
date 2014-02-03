@@ -8,10 +8,11 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import booba.skaya.escooba.Escooba;
 import booba.skaya.escooba.game.EscoobaCard;
 import booba.skaya.escooba.game.EscoobaGame;
 
-public class EscoobaTableView extends View {
+public class EscoobaTableView extends View{
 	private Paint mTextPaint;
 
 	private Paint _clickPaint;
@@ -19,6 +20,8 @@ public class EscoobaTableView extends View {
 	//the shapes to display
 	private PlayerShape _playerShape;
 	private TableShape _tableShape;
+
+	private Escooba mEscooba;
 
 	public EscoobaTableView(Context context) {
 		super(context);
@@ -77,8 +80,11 @@ public class EscoobaTableView extends View {
 	public boolean onTouchEvent(MotionEvent event) {
 		boolean result = super.onTouchEvent(event);
 
-		_playerShape.onTouchEvent(event);
-		_tableShape.onTouchEvent(event);
+		boolean cardTouched = _playerShape.onTouchEvent(event);
+		cardTouched = cardTouched || _tableShape.onTouchEvent(event);
+		if(cardTouched && mEscooba != null){
+			mEscooba.cardToggled();
+		}
 		invalidate();
 		return result;
 	}
@@ -105,5 +111,9 @@ public class EscoobaTableView extends View {
 		for(CardShape c : _tableShape.getCards()){
 			c.setChosen(false);
 		}
+	}
+
+	public void setEscooba(Escooba escooba) {
+		mEscooba = escooba;
 	}
 }

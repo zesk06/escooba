@@ -35,6 +35,7 @@ public class Escooba extends Activity implements EscoobagameListener {
 		_playButton = (Button) findViewById(R.id.play_button);
 		_tableView = (EscoobaTableView) findViewById(R.id.escoobaTableView1);
 		_tableView.setEscoobaGame(_g);
+		_tableView.setEscooba(this);
 	}
 	
 	private void setEscoobaGame(EscoobaGame g){
